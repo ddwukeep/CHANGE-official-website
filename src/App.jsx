@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { ArrowRight, ArrowUpRight, Crosshair, Menu, Play, Wallet, X } from 'lucide-react'
-import Globe from './components/Globe'
 import { dataProvider } from './services/dataProvider'
 import { protocolFeatures, roadmap } from './data/mockData'
 
@@ -56,7 +55,12 @@ export default function App(){
  return <main>
   <div className="noise"/><SiteHeader onWallet={()=>setModal(true)} onMenu={()=>setMobile(!mobile)} mobile={mobile}/>
   {mobile&&<div className="mobile-nav">{nav.map(x=><a key={x} onClick={()=>setMobile(false)} href={`#${x.toLowerCase()}`}>{x}</a>)}</div>}
-  <section className="hero" id="home"><div className="ambient"/><div className="hud-sweep"/><div className="hero-stage"><HeroCopy onVision={()=>setModal(true)}/><div className="hero-visual"><Globe/></div><HudRail/></div><MetricsDashboard tick={tick} points={metrics}/><ExchangeTicker activity={activity}/></section>
+  <section className="hero" id="home">
+   <img className="hero-background" src="/assets/change-network-hero.png" alt="CHANGE global compute network" />
+   <div className="hero-shade"/><div className="hud-sweep"/>
+   <div className="hero-stage"><HeroCopy onVision={()=>setModal(true)}/><HudRail/></div>
+   <MetricsDashboard tick={tick} points={metrics}/><ExchangeTicker activity={activity}/>
+  </section>
   <section className="network section reveal"><div className="section-title"><div><Label n="NET.02">REAL-TIME DATA STREAM</Label><h2>LIVE<br/><em>NETWORK</em></h2></div><p>Distributed activity across the CHANGE network.<br/><span>Simulation feed / mock data</span></p></div><div className="table"><div className="tr th"><span>AMOUNT</span><span>ACTIVITY</span><span>REGION</span><span>NODE</span><span>STATUS</span><span>TIME</span></div>{activity.map(({id,row,time})=><div className="tr" key={id}>{row.map((v,i)=><span key={i} className={i===4?'status':''}>{i===4&&<b/>}{v}</span>)}<span>{time}</span></div>)}</div><div className="ticker">CHANGE NETWORK <i>●</i> ALL SYSTEMS OPERATIONAL <i>●</i> GLOBAL NODE FABRIC <i>●</i> MOCK DATA STREAM</div></section>
   <section className="protocol section" id="protocol"><div className="section-title reveal"><div><Label n="PRT.03">CORE SYSTEM</Label><h2>BUILT TO<br/><em>ADAPT.</em></h2></div><p>Modular infrastructure for an open,<br/>connected and continuously evolving world.</p></div><div className="feature-grid">{protocolFeatures.map(([n,t,d])=><article className="feature reveal" key={t}><span>[{n}]</span><Crosshair/><h3>{t}</h3><p>{d}</p><ArrowUpRight className="arrow"/></article>)}</div></section>
   <Exchange/>
