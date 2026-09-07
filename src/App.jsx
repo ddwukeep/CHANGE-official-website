@@ -8,6 +8,45 @@ const nav = ['HOME','NETWORK','PROTOCOL','EXCHANGE','ROADMAP','DOCS']
 function Spark({points}) { const max=Math.max(...points), d=points.map((p,i)=>`${i?'L':'M'}${i*14},${30-p/max*26}`).join(' '); return <svg className="spark" viewBox="0 0 100 32"><path d={d}/></svg> }
 function Label({children,n='SYS'}) { return <div className="eyebrow"><span>[ {n} ]</span>{children}</div> }
 
+const telemetry = [
+ ['ACTIVE CPU NODES','589,431','↗ +12.4%'], ['AVAILABLE COMPUTE','24,736','PH/s  ↗ +18.7%'],
+ ['COMPUTE SHARED','1.28M','CPU-H  ↗ +31.2%'], ['ACTIVE REGIONS','6 / 6',''],
+ ['$CHANGE HOLDERS','12,463','↗ +9.1%'],
+]
+
+function SiteHeader({onWallet,onMenu,mobile}) { return <header className="command-header">
+ <a className="brand" href="#home"><img src={`${import.meta.env.BASE_URL}assets/logo-placeholder.svg`}/><span>CHANGE<small>MEME-POWERED COMPUTE NETWORK</small></span></a>
+ <nav>{nav.map((x,i)=><a className={i===0?'active':''} key={x} href={`#${x.toLowerCase()}`}>{x}</a>)}</nav>
+ <div className="head-actions"><span className="online"><b/> NETWORK ONLINE</span><i/><button onClick={onWallet}><Wallet size={20}/> CONNECT WALLET</button></div>
+ <button className="menu" onClick={onMenu}>{mobile?<X/>:<Menu/>}</button>
+ </header> }
+
+function HeroCopy({onVision}) { return <div className="hero-copy">
+ <div className="hero-kicker">// IDLE CPUs. REAL VALUE. A BRIGHTER TOMORROW.</div>
+ <h1>TURN IDLE CPU<br/><span>INTO VALUE.</span></h1>
+ <h2>$CHANGE — MEME-POWERED COMPUTE NETWORK</h2>
+ <p>Connect idle computing power to the CHANGE network.<br/>Share resources. Power the network. Earn through participation.<br/>A global community. A more open, more efficient future.</p>
+ <div className="hero-actions"><a className="join" href="#network">JOIN THE NETWORK <ArrowRight/></a><button onClick={onVision}><i><Play size={20}/></i><span>WATCH<br/>OUR VISION</span></button></div>
+ <div className="hero-mantra"><span>MORE CPUs</span><b/><span>MORE PEOPLE</span><b/><span>MORE MEMES</span><b/><span>A MORE OPEN WORLD</span></div>
+ </div> }
+
+function HudRail() { return <aside className="brand-rail">
+ <div className="rail-top">GLOBAL<br/>DECENTRALIZED<br/>COMPUTE<br/>NETWORK<i/></div>
+ <div className="rail-words"><span>ADAPT</span><span>EVOLVE</span><span>CONNECT</span><span>SCALE</span><strong>CHANGE</strong><i/></div>
+ <div className="rail-statement">THE WORLD<br/>HAS BILLIONS OF<br/>IDLE CPUs.<strong>CHANGE PUTS<br/>THEM TO WORK.</strong></div>
+ </aside> }
+
+function MetricsDashboard({tick,points}) { return <section className="telemetry" id="network">
+ <div className="telemetry-note">SIMULATED NETWORK DATA</div>
+ <div className="metrics">{telemetry.map(([label,value,change],i)=><article className="metric" key={label}><div className="metric-label"><span>{['◉','▣','◎','⊕','♧'][i]}</span>{label}</div><div className="metric-row"><strong>{i===0?(589431+tick%4).toLocaleString():i===4?(12463+tick%3).toLocaleString():value}</strong><em>{change}</em></div>{i===3?<div className="region-bars"><i/><i/><i/></div>:<Spark points={points[i]?.points || [2,4,3,7,6,9,8,12]}/>}</article>)}
+ <article className="live-card"><strong><b/> LIVE</strong><div><span>BLOCK<b>#12,584,221</b></span><span>TPS<b>3,428</b></span><span>LATENCY<b>428ms</b></span></div></article></div>
+ </section> }
+
+function ExchangeTicker({activity}) { const feed=activity.length?activity:[{id:'mock',time:'14:23',row:['','','US-West','7f3a']}]; return <section className="exchange-strip">
+ <div className="exchange-heading"><span>// REAL-TIME CPU COMPUTE EXCHANGE</span><b>MOCK NETWORK ACTIVITY</b><em>CPU-H&nbsp;&nbsp;&nbsp; REGION&nbsp;&nbsp;&nbsp; NODE&nbsp;&nbsp;&nbsp; $CHANGE REWARD&nbsp;&nbsp;&nbsp; STATUS</em></div>
+ <div className="ticker-track">{[...feed,...feed,...feed].map((a,i)=><i key={`${a.id}-${i}`}>[{a.time}] &nbsp;<b>{[128,320,64,512,96,240][i%6]} CPU-H</b>&nbsp; | &nbsp;{a.row[2]}&nbsp; | &nbsp;node-{a.row[3]}&nbsp; | &nbsp;<em>+{(6.4+i*3.1).toFixed(1)} $CHANGE</em>&nbsp; | &nbsp;<strong>COMPLETED</strong></i>)}</div>
+ </section> }
+
 export default function App(){
  const [mobile,setMobile]=useState(false), [modal,setModal]=useState(false), [metrics,setMetrics]=useState([]), [activity,setActivity]=useState([]), [tick,setTick]=useState(0)
  useEffect(()=>{dataProvider.getMetrics().then(setMetrics); dataProvider.getActivity().then(setActivity)},[])
@@ -15,13 +54,9 @@ export default function App(){
  useEffect(()=>{const id=setInterval(()=>setTick(x=>x+1),2400);return()=>clearInterval(id)},[])
  useEffect(()=>{const obs=new IntersectionObserver(es=>es.forEach(e=>e.isIntersecting&&e.target.classList.add('visible')),{threshold:.12});document.querySelectorAll('.reveal').forEach(x=>obs.observe(x));return()=>obs.disconnect()},[])
  return <main>
-  <div className="noise"/><header><a className="brand" href="#home"><img src={`${import.meta.env.BASE_URL}assets/logo-placeholder.svg`}/><span>CHANGE<br/><small>MEME-POWERED COMPUTE NETWORK</small></span></a><nav>{nav.map(x=><a key={x} href={`#${x.toLowerCase()}`}>{x}</a>)}</nav><div className="head-actions"><span className="online"><b/> NETWORK ONLINE</span><button onClick={()=>setModal(true)}><Wallet size={16}/> CONNECT WALLET</button></div><button className="menu" onClick={()=>setMobile(!mobile)}>{mobile?<X/>:<Menu/>}</button></header>
+  <div className="noise"/><SiteHeader onWallet={()=>setModal(true)} onMenu={()=>setMobile(!mobile)} mobile={mobile}/>
   {mobile&&<div className="mobile-nav">{nav.map(x=><a key={x} onClick={()=>setMobile(false)} href={`#${x.toLowerCase()}`}>{x}</a>)}</div>}
-  <section className="hero" id="home">
-   <div className="ambient"/><div className="hud-sweep"/><div className="hero-main"><div className="hero-copy"><div className="hero-kicker">// IDLE CPUs. REAL VALUE. A BRIGHTER TOMORROW.</div><h1>TURN IDLE CPU<br/><span>INTO VALUE.</span></h1><h3>$CHANGE — MEME-POWERED COMPUTE NETWORK</h3><p>Connect idle computing power to the CHANGE network.<br/>Share resources. Power the network. Earn through participation.<br/>A global community. A more open, more efficient future.</p><div className="hero-actions"><a className="join" href="#network">JOIN THE NETWORK <ArrowRight/></a><button onClick={()=>setModal(true)}><i><Play size={18}/></i> WATCH OUR VISION</button></div><div className="hero-mantra">MORE CPUs <b/> MORE PEOPLE <b/> MORE MEMES <b/> A MORE OPEN WORLD</div></div><div className="hero-visual"><Globe/></div><aside className="brand-rail"><div className="rail-top">GLOBAL<br/>DECENTRALIZED<br/>COMPUTE<br/>NETWORK<i/></div><div className="rail-words"><span>ADAPT</span><span>EVOLVE</span><span>CONNECT</span><span>SCALE</span><strong>CHANGE</strong></div><div className="rail-statement">THE WORLD<br/>HAS BILLIONS OF<br/>IDLE CPUs.<strong>CHANGE PUTS<br/>THEM TO WORK.</strong></div><small>SYS // 00-CHG<br/>UPLINK STABLE</small></aside></div>
-   <div className="dashboard-label"><span>// NETWORK TELEMETRY</span><b>SIMULATED NETWORK DATA</b></div><div className="metrics" id="network">{metrics.map((m,i)=><div className="metric" key={m.label}><Label n="">{['ACTIVE CPU NODES','AVAILABLE COMPUTE','COMPUTE SHARED','ACTIVE REGIONS','$CHANGE HOLDERS'][i]}</Label><div className="metric-row"><strong>{i===0?(124892+tick%4).toLocaleString():i===1?'8.42M':i===2?'2.84M':i===3?'6':(48294+tick%3).toLocaleString()}</strong><span>{i===1||i===2?'CPU-H':m.change}</span></div><Spark points={m.points}/></div>)}<div className="live-card"><strong><b/> LIVE</strong><div><span>FEED<br/><b>SIMULATED</b></span><span>REGIONS<br/><b>6 / 6</b></span><span>LATENCY<br/><b>428ms</b></span></div></div></div>
-   <div className="exchange-strip"><span>// REAL-TIME CPU COMPUTE EXCHANGE <small>MOCK NETWORK DATA</small><em>CPU-H&nbsp;&nbsp; REGION&nbsp;&nbsp; NODE&nbsp;&nbsp; $CHANGE REWARD&nbsp;&nbsp; STATUS</em></span><div className="ticker-track">{[...activity,...activity].map((a,i)=><i key={`${a.id}-${i}`}>[{a.time}] &nbsp;<b>{[128,320,64,512,96,240][i%6]} CPU-H</b>&nbsp; | &nbsp;{a.row[2]}&nbsp; | &nbsp;NODE-{a.row[3]}&nbsp; | &nbsp;<em>+{(6.4+i*3.1).toFixed(1)} $CHANGE</em>&nbsp; | &nbsp;<strong>COMPLETED</strong></i>)}</div></div>
-  </section>
+  <section className="hero" id="home"><div className="ambient"/><div className="hud-sweep"/><div className="hero-stage"><HeroCopy onVision={()=>setModal(true)}/><div className="hero-visual"><Globe/></div><HudRail/></div><MetricsDashboard tick={tick} points={metrics}/><ExchangeTicker activity={activity}/></section>
   <section className="network section reveal"><div className="section-title"><div><Label n="NET.02">REAL-TIME DATA STREAM</Label><h2>LIVE<br/><em>NETWORK</em></h2></div><p>Distributed activity across the CHANGE network.<br/><span>Simulation feed / mock data</span></p></div><div className="table"><div className="tr th"><span>AMOUNT</span><span>ACTIVITY</span><span>REGION</span><span>NODE</span><span>STATUS</span><span>TIME</span></div>{activity.map(({id,row,time})=><div className="tr" key={id}>{row.map((v,i)=><span key={i} className={i===4?'status':''}>{i===4&&<b/>}{v}</span>)}<span>{time}</span></div>)}</div><div className="ticker">CHANGE NETWORK <i>●</i> ALL SYSTEMS OPERATIONAL <i>●</i> GLOBAL NODE FABRIC <i>●</i> MOCK DATA STREAM</div></section>
   <section className="protocol section" id="protocol"><div className="section-title reveal"><div><Label n="PRT.03">CORE SYSTEM</Label><h2>BUILT TO<br/><em>ADAPT.</em></h2></div><p>Modular infrastructure for an open,<br/>connected and continuously evolving world.</p></div><div className="feature-grid">{protocolFeatures.map(([n,t,d])=><article className="feature reveal" key={t}><span>[{n}]</span><Crosshair/><h3>{t}</h3><p>{d}</p><ArrowUpRight className="arrow"/></article>)}</div></section>
   <Exchange/>
