@@ -10,14 +10,18 @@ export default function Globe() {
   const ref = useRef(null), wrap = useRef(null), [shift,setShift] = useState({x:0,y:0})
   useEffect(() => {
     const canvas=ref.current, ctx=canvas.getContext('2d'); let frame,t=0
-    const dots=Array.from({length:620},(_,i)=>({lat:Math.acos(1-2*(i+.5)/620)-Math.PI/2,lon:Math.PI*(1+Math.sqrt(5))*i}))
+    const count=innerWidth<700?430:1050
+    const dots=Array.from({length:count},(_,i)=>({lat:Math.acos(1-2*(i+.5)/count)-Math.PI/2,lon:Math.PI*(1+Math.sqrt(5))*i}))
+    const dust=Array.from({length:innerWidth<700?30:75},(_,i)=>({x:(i*83%997)/997,y:(i*193%991)/991,r:.3+(i%3)*.35,p:i*.7}))
     const resize=()=>{const d=Math.min(devicePixelRatio,1.7),s=canvas.clientWidth;canvas.width=s*d;canvas.height=s*d;ctx.setTransform(d,0,0,d,0,0)}
-    const draw=()=>{const s=canvas.clientWidth,c=s/2,r=s*.405;ctx.clearRect(0,0,s,s);t+=.0013
+    const draw=()=>{const s=canvas.clientWidth,c=s/2,r=s*.41;ctx.clearRect(0,0,s,s);t+=.00115
+      dust.forEach(d=>{const a=.1+.18*(1+Math.sin(t*18+d.p));ctx.fillStyle=`rgba(105,255,51,${a})`;ctx.fillRect((d.x*s+t*12)%s,d.y*s,d.r,d.r)})
       const g=ctx.createRadialGradient(c-r*.25,c-r*.25,0,c,c,r);g.addColorStop(0,'rgba(96,255,46,.12)');g.addColorStop(.75,'rgba(20,90,17,.08)');g.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(c,c,r,0,7);ctx.fill()
-      ctx.strokeStyle='rgba(92,255,46,.45)';ctx.lineWidth=.7;ctx.beginPath();ctx.arc(c,c,r,0,7);ctx.stroke()
+      ctx.strokeStyle='rgba(92,255,46,.68)';ctx.shadowColor='#5dff31';ctx.shadowBlur=9;ctx.lineWidth=.8;ctx.beginPath();ctx.arc(c,c,r,0,7);ctx.stroke();ctx.shadowBlur=0
       const p=[];dots.forEach((d,i)=>{const q=d.lon+t,x=Math.cos(d.lat)*Math.sin(q),y=Math.sin(d.lat),z=Math.cos(d.lat)*Math.cos(q);if(z>-.08){const px=c+x*r,py=c-y*r;p.push([px,py,z,i]);ctx.fillStyle=`rgba(103,255,52,${.16+Math.max(z,0)*.78})`;ctx.fillRect(px,py,z>.72?1.7:1,z>.72?1.7:1)}})
-      for(let i=0;i<24;i++){const a=p[(i*19+23)%p.length],b=p[(i*43+91)%p.length];if(!a||!b)continue;ctx.strokeStyle=`rgba(112,255,58,${.08+(i%4)*.025})`;ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.quadraticCurveTo((a[0]+b[0])/2,c-r*(.42+(i%3)*.09),b[0],b[1]);ctx.stroke()}
-      for(let i=0;i<7;i++){const a=p[(i*73+Math.floor(t*600))%p.length];if(!a)continue;const pulse=3+(Math.sin(t*35+i)+1)*3;ctx.strokeStyle='rgba(110,255,55,.5)';ctx.beginPath();ctx.arc(a[0],a[1],pulse,0,7);ctx.stroke();ctx.fillStyle='#8cff45';ctx.beginPath();ctx.arc(a[0],a[1],2.2,0,7);ctx.fill()}
+      for(let i=0;i<34;i++){const a=p[(i*29+23)%p.length],b=p[(i*47+91)%p.length];if(!a||!b)continue;const mx=(a[0]+b[0])/2,my=Math.min(a[1],b[1])-r*(.12+(i%4)*.045);ctx.strokeStyle=`rgba(112,255,58,${.11+(i%4)*.025})`;ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.quadraticCurveTo(mx,my,b[0],b[1]);ctx.stroke();if(i<16){const u=(t*45+i*.071)%1,v=1-u,px=v*v*a[0]+2*v*u*mx+u*u*b[0],py=v*v*a[1]+2*v*u*my+u*u*b[1];ctx.shadowColor='#70ff36';ctx.shadowBlur=8;ctx.fillStyle='#c4ffad';ctx.beginPath();ctx.arc(px,py,1.4,0,7);ctx.fill();ctx.shadowBlur=0}}
+      for(let i=0;i<18;i++){const a=p[(i*73+Math.floor(t*420))%p.length];if(!a)continue;const pulse=3+(Math.sin(t*35+i)+1)*3;ctx.strokeStyle='rgba(110,255,55,.65)';ctx.beginPath();ctx.arc(a[0],a[1],pulse,0,7);ctx.stroke();ctx.shadowColor='#70ff36';ctx.shadowBlur=12;ctx.fillStyle='#b5ff91';ctx.beginPath();ctx.arc(a[0],a[1],2.1+(i%3)*.35,0,7);ctx.fill();ctx.shadowBlur=0}
+      const scan=(t*95)%(r*2);ctx.save();ctx.beginPath();ctx.arc(c,c,r,0,7);ctx.clip();const sg=ctx.createLinearGradient(0,c-r+scan-18,0,c-r+scan+18);sg.addColorStop(0,'transparent');sg.addColorStop(.5,'rgba(112,255,54,.12)');sg.addColorStop(1,'transparent');ctx.fillStyle=sg;ctx.fillRect(c-r,c-r+scan-18,r*2,36);ctx.restore()
       frame=requestAnimationFrame(draw)}
     resize();draw();addEventListener('resize',resize);return()=>{cancelAnimationFrame(frame);removeEventListener('resize',resize)}
   },[])
