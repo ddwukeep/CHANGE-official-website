@@ -56,7 +56,7 @@ export default function App(){
   <div className="noise"/><SiteHeader onWallet={()=>setModal(true)} onMenu={()=>setMobile(!mobile)} mobile={mobile}/>
   {mobile&&<div className="mobile-nav">{nav.map(x=><a key={x} onClick={()=>setMobile(false)} href={`#${x.toLowerCase()}`}>{x}</a>)}</div>}
   <section className="hero" id="home">
-   <img className="hero-background" src="/assets/change-network-hero.png" alt="CHANGE global compute network" />
+   <img className="hero-background" src={`${import.meta.env.BASE_URL}assets/change-network-hero.png`} alt="CHANGE global compute network" />
    <div className="hero-shade"/><div className="hud-sweep"/>
    <div className="hero-stage"><HeroCopy onVision={()=>setModal(true)}/><HudRail/></div>
    <MetricsDashboard tick={tick} points={metrics}/><ExchangeTicker activity={activity}/>
